@@ -19,6 +19,13 @@
             return null;
         }
 
+        document.addEventListener('DOMContentLoaded', function (event) {
+            window.top.postMessage({
+                action: 'wfx_iframe_loaded'
+            }, '*');
+            console.log('Iframe: wfx_iframe_loaded');
+        });
+
         window.addEventListener('message', function (event) {
             var data = event.data;
 
