@@ -1,70 +1,62 @@
-< !DOCTYPE html>
-    <html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 
-    <head>
-        <meta charset="utf-8">
-        <title>PLAY STATE TEST - BLANK TEMPLATE</title>
-        <script>
-            function getCookie(cookieName) {
-                var name = cookieName + "=";
-                var decodedCookie = decodeURIComponent(document.cookie);
-                var cookieArray = decodedCookie.split(';');
+<head>
+    <meta charset="utf-8">
+    <title>PLAY STATE TEST - BLANK TEMPLATE</title>
+    <script>
+        function getCookie(cookieName) {
+            var name = cookieName + "=";
+            var decodedCookie = decodeURIComponent(document.cookie);
+            var cookieArray = decodedCookie.split(';');
 
-                for (var i = 0; i < cookieArray.length; i++) {
-                    var cookie = cookieArray[i].trim();
-                    if (cookie.indexOf(name) === 0) {
-                        return cookie.substring(name.length);
-                    }
+            for (var i = 0; i < cookieArray.length; i++) {
+                var cookie = cookieArray[i].trim();
+                if (cookie.indexOf(name) === 0) {
+                    return cookie.substring(name.length);
                 }
-                return null;
+            }
+            return null;
+        }
+
+        window.addEventListener('message', function (event) {
+            var data = event.data;
+
+            function setCookie(name, value, days) {
+                var expiresDate = new Date(Date.now() + (days * 24 * 60 * 60 * 1000));
+                var expiresString = expiresDate.toUTCString();
+                var cookieString = `${name}=${value}; expires=${expiresString}; SameSite=None; Secure`;
+                document.cookie = cookieString;
+                console.log(`Cookie Added: ${cookieString}`);
             }
 
-            window.addEventListener("load", function () {
-                window.top.postMessage({
-                    action: 'wfx_iframe_loaded'
-                }, '*');
-            });
+            function removeCookie(name) {
+                var expiresString = "Thu, 01 Jan 1970 00:00:00 UTC";
+                var cookieString = `${name}=; expires=${expiresString}; SameSite=None; Secure`;
+                document.cookie = cookieString;
+                console.log(`Cookie Removed: ${cookieString}`);
+            }
 
-
-            window.addEventListener('message', function (event) {
-                var data = event.data;
-
-                function setCookie(name, value, days) {
-                    var expiresDate = new Date(Date.now() + (days * 24 * 60 * 60 * 1000));
-                    var expiresString = expiresDate.toUTCString();
-                    var cookieString = `${name}=${value}; expires=${expiresString}; SameSite=None; Secure`;
-                    document.cookie = cookieString;
-                    console.log(`Cookie Added: ${cookieString}`);
+            if (data.action === 'setWfxCookie') {
+                console.log(data);
+                setCookie(data.name, data.value, 7);
+            } else if (data.action === 'removeWfxCookie') {
+                removeCookie(data.name);
+            } else if (data.action === 'check_flow_status') {
+                var myCookieValue = getCookie("wfx_playState");
+                if (myCookieValue) {
+                    window.top.postMessage({
+                        action: 'flow_live',
+                        meta: myCookieValue
+                    }, '*');
+                    console.log(`Cookie sent: ${myCookieValue}`);
                 }
+            }
+        });
+    </script>
+</head>
 
-                function removeCookie(name) {
-                    var expiresString = "Thu, 01 Jan 1970 00:00:00 UTC";
-                    var cookieString = `${name}=; expires=${expiresString}; SameSite=None; Secure`;
-                    document.cookie = cookieString;
-                    console.log(`Cookie Removed: ${cookieString}`);
-                }
-
-                if (data.action === 'setWfxCookie') {
-                    console.log(data);
-                    setCookie(data.name, data.value, 7);
-                } else if (data.action === 'removeWfxCookie') {
-                    removeCookie(data.name);
-                } else if (data.action === 'check_flow_status') {
-                    var myCookieValue = getCookie("wfx_playState");
-                    if (myCookieValue) {
-                        window.top.postMessage({
-                            action: 'flow_live',
-                            meta: myCookieValue
-                        }, '*');
-                        console.log(`Cookie sent: ${myCookieValue}`);
-                    }
-                }
-            });
-        </script>
-    </head>
-
-    <body>
-        <div>Hello There</div>
-    </body>
-
-    </html>
+<body>
+    <div>Hello There</div>
+</body>
+</html>
