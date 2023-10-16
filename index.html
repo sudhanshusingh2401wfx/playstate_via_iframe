@@ -19,6 +19,12 @@
             return null;
         }
 
+        window.addEventListener("load", function () {
+            window.top.postMessage({
+                action: 'wfx_iframe_loaded'
+            }, '*');
+        });
+
         window.addEventListener('message', function (event) {
             var data = event.data;
 
@@ -59,4 +65,5 @@
 <body>
     <div>Hello There</div>
 </body>
+
 </html>
