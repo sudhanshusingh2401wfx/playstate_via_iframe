@@ -70,6 +70,31 @@
                     console.log(`Iframe Window : Flow Inactive -> Cookie not found -> ${myCookieValue}`);
                 }
             }
+            else if (data.action === 'set_data_in_frame') {
+                setCookie(data.name, data.value, 7);
+                console.log('Iframe Window: Setting data in cookies -> name=' + data.name + " | value=" + data.value);
+            }
+            else if (data.action === 'get_data_from_iframe') {
+                if (data.name) {
+                    var myCookieValue = getCookie(data.name);
+                }
+                else {
+                    console.log('Iframe Window: Invalid name');
+                    return;
+                }
+                if (myCookieValue) {
+                    window.top.postMessage({
+                        action: 'give_data',
+                        name: data.name,
+                        meta: myCookieValue
+                    }, '*');
+                    console.log('Iframe Window: Sending data to top window -> name=' + data.name + " | value=" + myCookieValue)
+                }
+                else {
+                    console.log('Iframe Window: Cookie not found');
+                    return;
+                }
+            }
         });
 
     </script>
